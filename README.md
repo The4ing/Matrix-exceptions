@@ -29,7 +29,7 @@ It enhances the previous assignment by adding **exception handling**, **robust i
 ## 3. Main Data Structures:
 - `Matrix` – 2D vector representing square matrices of max size 5×5.
 - `std::vector<std::unique_ptr<Operation>>` – Stores created operations, allows dynamic allocation and polymorphism.
-- `std::unordered_map` (if used) – Maps command strings to handlers.
+- `std::unordered_map`  – Maps command strings to handlers.
 
 ---
 
