@@ -130,7 +130,7 @@ void FunctionCalculator::del()
 
 void FunctionCalculator::resize()
 {
-    m_ostr << "Enter new maximum number of functions (2–100): ";
+    m_ostr << "Enter new maximum number of functions (2-100): ";
 
     int newMax = 0;
     m_istr >> newMax;
@@ -236,7 +236,6 @@ FunctionCalculator::Action FunctionCalculator::readAction() const
 
     throw InvalidAction();
 }
-
 void FunctionCalculator::readFromFile()
 {
     std::string filepath;
@@ -252,51 +251,78 @@ void FunctionCalculator::readFromFile()
         return;
     }
 
+    // שמירה על זרמי הקלט/פלט המקוריים
+    std::streambuf* prevInput = m_istr.rdbuf();
+    std::streambuf* prevOutput = m_ostr.rdbuf();
+
     std::string line;
     int lineNumber = 0;
+
     while (std::getline(file, line)) {
         ++lineNumber;
         if (line.empty()) continue;
 
         std::istringstream lineStream(line);
+        std::ostringstream oss;
+
+        // החלפת זרמים זמנית
+        m_istr.rdbuf(lineStream.rdbuf());
+        m_ostr.rdbuf(oss.rdbuf());
+
         std::string command;
         lineStream >> command;
 
-        if (command == "read") {
-            m_ostr << "Skipping unsupported 'read' command in file at line " << lineNumber << "\n";
-            continue;
-        }
-
         const auto it = std::ranges::find(m_actions, command, &ActionDetails::command);
         if (it == m_actions.end()) {
-            m_ostr << "Unknown command '" << command << "' at line " << lineNumber << "\n";
+            // החזרה לזרמים רגילים
+            m_istr.rdbuf(prevInput);
+            m_ostr.rdbuf(prevOutput);
+
+            m_ostr << "Unknown command at line " << lineNumber << ": " << line << "\n";
+
+            // ❗ עצירה על שגיאה עם שאלה למשתמש
+            std::string choice;
+            std::cout << "Continue reading the file? (y/n): ";
+            std::cin >> choice;
+            if (choice != "y" && choice != "Y") {
+                std::cout << "Stopped reading from file.\n";
+                return;
+            }
             continue;
         }
 
         try {
-            std::streambuf* originalInBuf = m_istr.rdbuf();
-            std::ostringstream oss;
-            std::streambuf* originalOutBuf = m_ostr.rdbuf();
-
-            m_istr.rdbuf(lineStream.rdbuf());    
-            m_ostr.rdbuf(oss.rdbuf());           
-
-            runAction(it->action);               
-
-            m_istr.rdbuf(originalInBuf);         
-            m_ostr.rdbuf(originalOutBuf);     
-
-            m_ostr << oss.str();                
+            runAction(it->action);
         }
-
         catch (const std::exception& e) {
-            m_ostr << "Error at line " << lineNumber << ": " << e.what() << '\n';
-            m_istr.clear();
+            // ❗ החזרה מיידית לזרמים המקוריים במקרה של שגיאה
+            m_istr.rdbuf(prevInput);
+            m_ostr.rdbuf(prevOutput);
+
+            m_ostr << "Error at line " << lineNumber << ": " << e.what();
+            m_ostr << "Line content: " << line << '\n';
+
+            // ❗ שאלה למשתמש אם להמשיך
+            std::string choice;
+            std::cout << "Continue reading the file? (y/n): ";
+            std::cin >> choice;
+            if (choice != "y" && choice != "Y") {
+                std::cout << "Stopped reading from file.\n";
+                return;
+            }
+            continue;
         }
+
+        // ❗ החזרה לזרמים המקוריים לאחר פעולה תקינה
+        m_istr.rdbuf(prevInput);
+        m_ostr.rdbuf(prevOutput);
+
+        m_ostr << oss.str();
     }
+
+    m_istr.rdbuf(prevInput);
+    m_ostr.rdbuf(prevOutput);
 }
-
-
 
 
 
