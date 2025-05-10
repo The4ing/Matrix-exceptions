@@ -19,7 +19,7 @@ Operation::T Add::compute(const std::vector<T>& input) const
         for (int j = 0; j < result.size(); ++j)
         {
             if (result(i, j) < MIN_ALLOWED_VALUE || result(i, j) > MAX_ALLOWED_VALUE) {
-                throw MatrixValueOutOfRange();  // ?? ????? ???????
+                throw MatrixValueOutOfRange();  
             }
         }
     }
