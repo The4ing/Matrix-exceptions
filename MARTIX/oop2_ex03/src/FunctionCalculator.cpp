@@ -251,7 +251,7 @@ void FunctionCalculator::readFromFile()
         return;
     }
 
-    // שמירה על זרמי הקלט/פלט המקוריים
+  
     std::streambuf* prevInput = m_istr.rdbuf();
     std::streambuf* prevOutput = m_ostr.rdbuf();
 
@@ -265,7 +265,7 @@ void FunctionCalculator::readFromFile()
         std::istringstream lineStream(line);
         std::ostringstream oss;
 
-        // החלפת זרמים זמנית
+        
         m_istr.rdbuf(lineStream.rdbuf());
         m_ostr.rdbuf(oss.rdbuf());
 
@@ -280,7 +280,7 @@ void FunctionCalculator::readFromFile()
 
             m_ostr << "Unknown command at line " << lineNumber << ": " << line << "\n";
 
-            // ❗ עצירה על שגיאה עם שאלה למשתמש
+           
             std::string choice;
             std::cout << "Continue reading the file? (y/n): ";
             std::cin >> choice;
@@ -295,15 +295,14 @@ void FunctionCalculator::readFromFile()
             runAction(it->action);
         }
         catch (const std::exception& e) {
-            // ❗ החזרה מיידית לזרמים המקוריים במקרה של שגיאה
+       
             m_istr.rdbuf(prevInput);
             m_ostr.rdbuf(prevOutput);
 
             m_ostr << "Error at line " << lineNumber << ": " << e.what();
             m_ostr << "Line content: " << line << '\n';
 
-            // ❗ שאלה למשתמש אם להמשיך
-            std::string choice;
+	    std::string choice;
             std::cout << "Continue reading the file? (y/n): ";
             std::cin >> choice;
             if (choice != "y" && choice != "Y") {
@@ -313,7 +312,7 @@ void FunctionCalculator::readFromFile()
             continue;
         }
 
-        // ❗ החזרה לזרמים המקוריים לאחר פעולה תקינה
+    
         m_istr.rdbuf(prevInput);
         m_ostr.rdbuf(prevOutput);
 
