@@ -88,7 +88,7 @@ void FunctionCalculator::eval()
                         if (m_istr.fail()) throw InputFailure();
 
                         if (val < MIN_ALLOWED_VALUE || val > MAX_ALLOWED_VALUE) {
-                            throw MatrixValueOutOfRange(); // או חריגה ייעודית כמו MatrixValueOutOfRange
+                            throw MatrixValueOutOfRange(); 
                         }
 
                         input(row, col) = val;
